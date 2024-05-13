@@ -1,0 +1,16 @@
+# Modulus logs
+*events.out.tfevents*
+
+# Modulus training data
+*.vtp
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so

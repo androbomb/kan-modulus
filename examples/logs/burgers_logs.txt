@@ -1,0 +1,46 @@
+[13:56:52] - JIT using the NVFuser TorchScript backend
+[13:56:52] - Disabling JIT because functorch does not work with it.
+[13:56:52] - JitManager: {'_enabled': False, '_arch_mode': <JitArchMode.ONLY_ACTIVATION: 1>, '_use_nvfuser': True, '_autograd_nodes': False}
+[13:56:52] - GraphManager: {'_func_arch': True, '_debug': False, '_func_arch_allow_partial_hessian': True}
+[13:56:52] - Arch Node: flow_network has been converted to a FuncArch node.
+[13:56:53] - Installed PyTorch version 2.0.1 is not TorchScript supported in Modulus. Version 1.14.0a0+410ce96 is officially supported.
+[13:56:53] - attempting to restore from: outputs/burgers
+[13:56:53] - optimizer checkpoint not found
+[13:56:53] - model flow_network.0.pth not found
+[13:56:54] - [step:          0] record constraint batch time:  1.370e-01s
+[13:56:55] - [step:          0] record inferencers time:  8.371e-01s
+[13:56:55] - [step:          0] saved checkpoint to outputs/burgers
+[13:56:55] - [step:          0] loss:  1.003e+00
+[13:56:57] - Attempting cuda graph building, this may take a bit...
+[13:56:59] - [step:        100] record constraint batch time:  1.506e-01s
+[13:56:59] - [step:        100] record inferencers time:  5.146e-01s
+[13:56:59] - [step:        100] loss:  8.568e-01, time/iteration:  4.276e+01 ms
+[13:57:01] - [step:        200] record constraint batch time:  1.396e-01s
+[13:57:01] - [step:        200] record inferencers time:  5.323e-01s
+[13:57:01] - [step:        200] loss:  4.175e-01, time/iteration:  2.198e+01 ms
+[13:57:03] - [step:        300] record constraint batch time:  1.443e-01s
+[13:57:04] - [step:        300] record inferencers time:  5.135e-01s
+[13:57:04] - [step:        300] loss:  2.566e-01, time/iteration:  2.174e+01 ms
+[13:57:05] - [step:        400] record constraint batch time:  1.479e-01s
+[13:57:06] - [step:        400] record inferencers time:  5.161e-01s
+[13:57:06] - [step:        400] loss:  2.325e-01, time/iteration:  2.184e+01 ms
+[13:57:07] - [step:        500] record constraint batch time:  1.499e-01s
+[13:57:08] - [step:        500] record inferencers time:  5.386e-01s
+[13:57:08] - [step:        500] loss:  2.202e-01, time/iteration:  2.215e+01 ms
+[13:57:10] - [step:        600] record constraint batch time:  1.451e-01s
+[13:57:10] - [step:        600] record inferencers time:  5.192e-01s
+[13:57:10] - [step:        600] loss:  2.083e-01, time/iteration:  2.180e+01 ms
+[13:57:12] - [step:        700] record constraint batch time:  1.427e-01s
+[13:57:12] - [step:        700] record inferencers time:  5.307e-01s
+[13:57:12] - [step:        700] loss:  2.090e-01, time/iteration:  2.199e+01 ms
+[13:57:14] - [step:        800] record constraint batch time:  1.402e-01s
+[13:57:15] - [step:        800] record inferencers time:  5.100e-01s
+[13:57:15] - [step:        800] loss:  2.052e-01, time/iteration:  2.166e+01 ms
+[13:57:16] - [step:        900] record constraint batch time:  1.366e-01s
+[13:57:17] - [step:        900] record inferencers time:  5.049e-01s
+[13:57:17] - [step:        900] loss:  1.978e-01, time/iteration:  2.159e+01 ms
+[13:57:19] - [step:       1000] record constraint batch time:  1.747e-01s
+[13:57:20] - [step:       1000] record inferencers time:  5.575e-01s
+[13:57:20] - [step:       1000] saved checkpoint to outputs/burgers
+[13:57:20] - [step:       1000] loss:  1.956e-01, time/iteration:  2.935e+01 ms
+[13:57:20] - [step:       1000] reached maximum training steps, finished training!
