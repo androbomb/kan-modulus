@@ -1,9 +1,18 @@
 # Part of the Chebysjev Implementation came from
 # https://github.com/SpaceLearner/JacobiKAN/blob/main/ChebyKANLayer.py
 # Inspiration from https://arxiv.org/pdf/2406.02917
+from typing import Optional, Dict, Tuple, Union, List
+from modulus.sym.key import Key
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+import math
+from torch import Tensor
+
+from modulus.sym.models.layers import Activation, get_activation_fn
+#from modulus.sym.models.activation import Activation, get_activation_fn
+from modulus.sym.models.arch import Arch
 
 # This is inspired by Kolmogorov-Arnold Networks but using Jacobian polynomials instead of splines coefficients
 class JacobiKANLayer(nn.Module):
@@ -27,11 +36,21 @@ class JacobiKANLayer(nn.Module):
         nn.init.normal_(self.jacobi_coeffs, mean=0.0, std=1/(input_dim * (degree + 1)))
 
     def forward(self, x):
+        """
+        For modulus, we need to rewrite the KAN linear layer to be capable of working without the Batching dimension.
+        """
+        is_modulus = False
+        # Added for Modulus
+        # if there is no batch. mimic batch
+        if x.dim() == 1:
+            x = x.unsqueeze(0)
+            is_modulus = True
         x = torch.reshape(x, (-1, self.inputdim))  # shape = (batch_size, inputdim)
         # Since Jacobian polynomial is defined in [-1, 1]
         # We need to normalize x to [-1, 1] using tanh
         x = torch.tanh(x)
         # Initialize Jacobian polynomial tensors
+        """orig impl
         jacobi = torch.ones(x.shape[0], self.inputdim, self.degree + 1, device=x.device)
         if self.degree > 0: ## degree = 0: jacobi[:, :, 0] = 1 (already initialized) ; degree = 1: jacobi[:, :, 1] = x ; d
             jacobi[:, :, 1] = ((self.a-self.b) + (self.a+self.b+2) * x) / 2
@@ -40,9 +59,25 @@ class JacobiKANLayer(nn.Module):
             theta_k1 = (2*i+self.a+self.b-1)*(self.a*self.a-self.b*self.b) / (2*i*(i+self.a+self.b)*(2*i+self.a+self.b-2))
             theta_k2 = (i+self.a-1)*(i+self.b-1)*(2*i+self.a+self.b) / (i*(i+self.a+self.b)*(2*i+self.a+self.b-2))
             jacobi[:, :, i] = (theta_k * x + theta_k1) * jacobi[:, :, i - 1].clone() - theta_k2 * jacobi[:, :, i - 2].clone()  # 2 * x * jacobi[:, :, i - 1].clone() - jacobi[:, :, i - 2].clone()
+        """
+        jacobi_list = [
+            torch.ones_like(x, device=x.device) ,         # jacobi[:, :, 0]
+            ((self.a-self.b) + (self.a+self.b+2) * x) / 2 # jacobi[:, :, 1]
+        ]
+        for i in range(2, self.degree + 1):
+            theta_k  = (2*i+self.a+self.b)*(2*i+self.a+self.b-1) / (2*i*(i+self.a+self.b))
+            theta_k1 = (2*i+self.a+self.b-1)*(self.a*self.a-self.b*self.b) / (2*i*(i+self.a+self.b)*(2*i+self.a+self.b-2))
+            theta_k2 = (i+self.a-1)*(i+self.b-1)*(2*i+self.a+self.b) / (i*(i+self.a+self.b)*(2*i+self.a+self.b-2))
+            jacobi_list.append(
+                (theta_k * x + theta_k1) * jacobi_list[ i - 1].clone() - theta_k2 * jacobi_list[i - 2].clone()  # 2 * x * jacobi[:, :, i - 1].clone() - jacobi[:, :, i - 2].clone()
+            )
+        jacobi = torch.stack(jacobi_list, dim=-1).to(x.device)
         # Compute the Jacobian interpolation
         y = torch.einsum('bid,iod->bo', jacobi, self.jacobi_coeffs)  # shape = (batch_size, outdim)
         y = y.view(-1, self.outdim)
+        # added to remove batch size
+        if is_modulus:
+            y = y.squeeze(0)
         return y
 
 class jKANArchCore(nn.Module):
@@ -52,7 +87,8 @@ class jKANArchCore(nn.Module):
         layers_hidden : list  = [2,2],
         degree : int = 4,
         a : float = 1.0, 
-        b : float = 1.0
+        b : float = 1.0,
+        add_layernorm : bool = False
     ):
         super().__init__()
         
@@ -68,9 +104,12 @@ class jKANArchCore(nn.Module):
                     degree = self.degree,
                     a = a, 
                     b = b
-                ),
-                nn.LayerNorm(out_features) # To avoid gradient vanishing caused by tanh
+                )
             )
+            if add_layernorm:
+                self.layers.append(
+                    nn.LayerNorm(out_features) # To avoid gradient vanishing caused by tanh
+                )
 
     def forward(self, x: torch.Tensor, update_grid=False):
         for layer in self.layers:
@@ -102,8 +141,9 @@ class jKANArch(Arch):
         # KAN data,
         layers_hidden : list  = [2,2],
         degree : int = 4,
-        a_fact : float = 1.0, 
-        b_fact : float = 1.0
+        a_fact : float = 1.0 , 
+        b_fact : float = 1.0 ,
+        add_layernorm : bool = False, 
     ):
         super().__init__(
             input_keys  = input_keys,
@@ -141,7 +181,8 @@ class jKANArch(Arch):
             layers_hidden = self.layers_hidden ,
             degree = degree,
             a = a_fact,
-            b = b_fact
+            b = b_fact,
+            add_layernorm = add_layernorm
         )
 
     def _tensor_forward(self, x: Tensor) -> Tensor:
