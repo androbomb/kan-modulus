@@ -7,7 +7,7 @@ import torch.nn.functional as F
 import math
 from torch import Tensor
 
-from physicsnemo.sym.models.layers import Activation, get_activation_fn
+from physicsnemo.sym.models.activation import Activation, get_activation_fn
 from physicsnemo.sym.models.arch import Arch
 
 from rbf_layer import RBFKANLayer
