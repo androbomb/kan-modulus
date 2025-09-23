@@ -1,5 +1,5 @@
 from typing import Optional, Dict, Tuple, Union, List
-from modulus.sym.key import Key
+from physicsnemo.sym.key import Key
 
 import torch
 import torch.nn as nn
@@ -7,9 +7,8 @@ import torch.nn.functional as F
 import math
 from torch import Tensor
 
-from modulus.sym.models.layers import Activation, get_activation_fn
-#from modulus.sym.models.activation import Activation, get_activation_fn
-from modulus.sym.models.arch import Arch
+from physicsnemo.sym.models.layers import Activation, get_activation_fn
+from physicsnemo.sym.models.arch import Arch
 
 class KANLinear(torch.nn.Module):
     """
@@ -18,7 +17,7 @@ class KANLinear(torch.nn.Module):
         Blealtan Cao (@Blealtan)
         https://github.com/Blealtan/efficient-kan/tree/master
         
-    For modulus, we need to rewrite the KAN linear layer to be capable of working without the Batching dimension.
+    For physicsnemo, we need to rewrite the KAN linear layer to be capable of working without the Batching dimension.
     """
     def __init__(
         self,
@@ -167,12 +166,12 @@ class KANLinear(torch.nn.Module):
         )
 
     def forward(self, x: torch.Tensor):
-        is_modulus = False
-        # Added for Modulus
+        is_physicsnemo = False
+        # Added for physicsnemo
         # if there is no batch. mimic batch
         if x.dim() == 1:
             x = x.unsqueeze(0)
-            is_modulus = True
+            is_physicsnemo = True
 
         assert x.dim() == 2 and x.size(-1) == self.in_features, f"Error in KANLinear;\nx.dim() == 2 and x.size(1) == self.in_features\ngot\nx.dim() = {x.dim()}, x.size(1): {x.size(-1)} ; self.in_features: {self.in_features}"
         
@@ -184,7 +183,7 @@ class KANLinear(torch.nn.Module):
         )
         out = base_output + spline_output
 
-        if is_modulus:
+        if is_physicsnemo:
             out = out.squeeze(0)
         return out
 
@@ -319,7 +318,7 @@ class KANArchCore(nn.Module):
 class KANArch(Arch):
     def __init__(
         self,
-        # Modulus data
+        # physicsnemo data
         input_keys : List[Key],
         output_keys: List[Key],
         detach_keys: List[Key] = [],

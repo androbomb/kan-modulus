@@ -1,5 +1,5 @@
 from typing import Optional, Dict, Tuple, Union, List
-from modulus.sym.key import Key
+from physicsnemo.sym.key import Key
 
 import torch
 import torch.nn as nn
@@ -7,9 +7,8 @@ import torch.nn.functional as F
 import math
 from torch import Tensor
 
-from modulus.sym.models.layers import Activation, get_activation_fn
-#from modulus.sym.models.activation import Activation, get_activation_fn
-from modulus.sym.models.arch import Arch
+from physicsnemo.sym.models.layers import Activation, get_activation_fn
+from physicsnemo.sym.models.arch import Arch
 
 from rbf_layer import RBFKANLayer
 
@@ -69,7 +68,7 @@ class RBFKANArchCore(nn.Module):
 class RBFKANArch(Arch):
     def __init__(
         self,
-        # Modulus data
+        # physicsnemo data
         input_keys : List[Key],
         output_keys: List[Key],
         detach_keys: List[Key] = [],

@@ -1,5 +1,5 @@
 from typing import Optional, Dict, Tuple, Union, List, Callable
-from modulus.sym.key import Key
+from physicsnemo.sym.key import Key
 
 import torch
 import torch.nn as nn
@@ -7,9 +7,8 @@ import torch.nn.functional as F
 import math
 from torch import Tensor
 
-from modulus.sym.models.layers import Activation, get_activation_fn
-#from modulus.sym.models.activation import Activation, get_activation_fn
-from modulus.sym.models.arch import Arch
+from physicsnemo.sym.models.layers import Activation, get_activation_fn
+from physicsnemo.sym.models.arch import Arch
 
 
 class RBFLayer(nn.Module):
@@ -150,7 +149,7 @@ class RBFLayer(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Computes the ouput of the RBF layer given an input vector, 
-        allowing the trick for being used with Nvidia Modulus
+        allowing the trick for being used with Nvidia PhysicsNemo
 
         Parameters
         ----------
@@ -165,16 +164,16 @@ class RBFLayer(nn.Module):
                 size of the input, and Fout is the output feature space
                 dimensionality
         """
-        is_modulus = False
-        # Added for Modulus
+        is_physicsnemo = False
+        # Added for PhysicsNemo
         # if there is no batch. mimic batch
         if x.dim() == 1:
             x = x.unsqueeze(0)
-            is_modulus = True
+            is_physicsnemo = True
 
         out = self._tensor_forward(x)
         
-        if is_modulus:
+        if is_physicsnemo:
             out = out.squeeze(0)
         return out
 
@@ -428,7 +427,7 @@ class RBFKANLayer(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Computes the ouput of the RBF layer given an input vector, 
-        allowing the trick for being used with Nvidia Modulus
+        allowing the trick for being used with Nvidia PhysicsNemo
 
         Parameters
         ----------
@@ -443,16 +442,16 @@ class RBFKANLayer(nn.Module):
                 size of the input, and Fout is the output feature space
                 dimensionality
         """
-        is_modulus = False
-        # Added for Modulus
+        is_physicsnemo = False
+        # Added for PhysicsNemo
         # if there is no batch. mimic batch
         if x.dim() == 1:
             x = x.unsqueeze(0)
-            is_modulus = True
+            is_physicsnemo = True
 
         out = self._tensor_forward(x)
         
-        if is_modulus:
+        if is_physicsnemo:
             out = out.squeeze(0)
         return out
 

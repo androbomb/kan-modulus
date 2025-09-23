@@ -1,0 +1,8 @@
+bootstrap: docker
+from: nvcr.io/nvidia/physicsnemo/physicsnemo:25.06
+stage: build
+
+%environment
+    export LC_ALL=C
+    export HYDRA_FULL_ERROR=1
+    export CUDA_LAUNCH_BLOCKING=1 

@@ -6,7 +6,7 @@ The ```KANLinear``` is based on the Efficient KAN by Blealtan Cao [@Blealtan](ht
 
 It was needed a small change in the ```KANLinear``` to handle the batched tensor in modulus. 
 
-**Addition of Juve 7th, 2024**: added Chebyshev and Jacobu KAN for nVidia Modulus, based on [#SynodicMonth](https://github.com/SynodicMonth) and [@SpaceLearner](https://github.com/SpaceLearner) GituHub repository [[1](https://github.com/SynodicMonth/ChebyKAN/), [2](https://github.com/SpaceLearner/JacobiKAN/tree/main)], adapted to work with Modulus. 
+**Addition of June 7th, 2024**: added Chebyshev and Jacobi KAN for nVidia Modulus, based on [#SynodicMonth](https://github.com/SynodicMonth) and [@SpaceLearner](https://github.com/SpaceLearner) GituHub repository [[1](https://github.com/SynodicMonth/ChebyKAN/), [2](https://github.com/SpaceLearner/JacobiKAN/tree/main)], adapted to work with Modulus. 
 
 ## Code
 The code is contained in a single python file, ```kan.py```, in the ```src``` folder.
@@ -21,6 +21,84 @@ in `examples` there are avilable also the modulus code for using (and testing) t
 
 in `examples` there are avilable also the modulus exampple code for using (and testing) the two new architectures `RBFArch` and `RBFKANLayer`.
 
+**Changes of September, 24th, 2025**: All code refactored to work with PhysicsNemo 25:06. Added `Apptainer` `.def` file for reproducibility.
+
+
 ## Examples
 There are two PDE examples in the ```examples``` folder, Heat Equation and Burgers Equation. 
 
+
+## Using Apptainer 
+
+### launch python script with singularity
+To launch it, use
+```bash
+apptainer exec --nv container_physicsnemo.sif python your.py
+```
+The `--nv` is crucial to see the nVidia drivers. 
+
+If we need to write on cache we need to bind the cache to a writable directory, via
+```bash
+apptainer exec --nv --bind /tmp/:/home/private/.cache container_physicsnemo.sif python your.py
+```
+
+### Creating the Environment using Singularity Apptainer
+
+First step, is to define the `.def` singularity file:
+```
+bootstrap: docker
+from: nvcr.io/nvidia/physicsnemo/physicsnemo:25.06
+stage: build
+
+%environment
+    export LC_ALL=C
+    export HYDRA_FULL_ERROR=1
+    export CUDA_LAUNCH_BLOCKING=1
+```
+If you need to customise your instance, like installing packages via `pip`, use the `%post` keyword, e.g.:
+```
+%post
+    pip3 install ipykernel plotly torchmetrics torchvision pydicom albumentations pyyaml SimpleITK einops
+```
+
+After that, we need to build the `.sif` container, as
+```bash
+apptainer build container_physicsnemo.sif container_physicsnemo.def 
+```
+We can test is by running it interatively
+```bash
+apptainer run container_physicsnemo.sif
+```
+
+Finally, we can use  `.sif` container to create an ipykernel; to do so, we need to create the folder 
+```bash
+mkdir -p ~/.local/share/jupyter/kernels/physicsnemo2506
+```
+and, within it, create the file `kernel.json`
+```json
+{
+    "display_name": "PhysicsNemo2506",
+    "argv": [
+        "/usr/bin/apptainer",
+        "run",
+        "--nv",
+        "--bind",
+        "/home",
+        "/path/to/container_physicsnemo.sif",
+        "python3",
+        "-m",
+        "ipykernel_launcher",
+        "-f",
+        "{connection_file}"
+    ],
+    "language": "python",
+    "metadata": {
+        "debugger": true
+    },
+    "env": {
+        "LD_LIBRARY_PATH": ":/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/.singularity.d/libs:/usr/local/lib/python3.12/dist-packages/nvidia/cudnn"
+    }
+}
+```
+Notice that we added in the `env` section the `LD_LIBRARY_PATH` env var, adding to the original one the path to cudnn as `/usr/local/lib/python3.12/dist-packages/nvidia/cudnn`
+For more details, see [the AI-INFN platform guide](https://ai-infn.baltig-pages.infn.it/wp-1/docs/environments/apptainer/#make-gpus-available-to-the-kernel).

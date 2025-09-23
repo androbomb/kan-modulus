@@ -14,3 +14,9 @@ __pycache__/
 
 # C extensions
 *.so
+
+# Apptainer container
+*.sif
+
+# Hydra folders
+.hydra/

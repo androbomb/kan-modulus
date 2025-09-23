@@ -11,29 +11,28 @@ import math
 from sympy import Symbol, Eq, Abs, And, Or, Xor, Function, Number
 from sympy import atan2, pi, sin, cos
 
-import modulus.sym
-from modulus.sym.hydra import to_absolute_path, instantiate_arch, ModulusConfig
-from modulus.sym.solver import Solver
-from modulus.sym.domain import Domain
-from modulus.sym.geometry.primitives_1d import Line1D
-from modulus.sym.geometry.primitives_2d import Rectangle, Circle
-from modulus.sym.domain.constraint import (
+import physicsnemo.sym
+from physicsnemo.sym.hydra import to_absolute_path, instantiate_arch, PhysicsNeMoConfig
+from physicsnemo.sym.solver import Solver
+from physicsnemo.sym.domain import Domain
+from physicsnemo.sym.geometry.primitives_1d import Line1D
+from physicsnemo.sym.geometry.primitives_2d import Rectangle, Circle
+from physicsnemo.sym.domain.constraint import (
     PointwiseBoundaryConstraint,
     PointwiseInteriorConstraint,
 )
-from modulus.sym.domain.validator import PointwiseValidator
-from modulus.sym.domain.inferencer import PointwiseInferencer
-from modulus.sym.key import Key
-from modulus.sym.utils.io import (
+from physicsnemo.sym.domain.validator import PointwiseValidator
+from physicsnemo.sym.domain.inferencer import PointwiseInferencer
+from physicsnemo.sym.key import Key
+from physicsnemo.sym.utils.io import (
     csv_to_dict,
     ValidatorPlotter,
     InferencerPlotter,
 )
 
-from modulus.sym.models.fully_connected import FullyConnectedArch
-from modulus.sym.models.layers import Activation
-#from modulus.sym.eq.pdes.diffusion import Diffusion
-from modulus.sym.eq.pde import PDE
+from physicsnemo.sym.models.fully_connected import FullyConnectedArch
+from physicsnemo.sym.models.layers import Activation
+from physicsnemo.sym.eq.pde import PDE
 
 # Import KANArch
 import sys
@@ -99,8 +98,8 @@ def get_model():
     
     return flow_net
 
-@modulus.sym.main(config_path="conf", config_name="config_heat")
-def run(cfg: ModulusConfig) -> None:
+@physicsnemo.sym.main(config_path="conf", config_name="config_heat")
+def run(cfg: PhysicsNeMoConfig) -> None:
     # MACRO PARAMS
     _ell = 1.0
     _diffusion_coefficient = 0.5
